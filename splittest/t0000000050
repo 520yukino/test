@@ -1,0 +1,3 @@
+drwxr-xr-x 1 root root       4096 Oct  7 20:45 rcS.d/
+-rw-r--r-- 1 root root        232 Oct 19 19:21 resolv.conf
+lrwxrwxrwx 1 root root         13 Mar 25  2022 rmt -> /usr/sbin/rmt*

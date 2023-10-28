@@ -1,0 +1,3 @@
+-rw-r--r-- 1 root root        694 Mar 23  2022 fuse.conf
+drwxr-xr-x 1 root root       4096 Jun  7 10:08 fwupd/
+-rw-r--r-- 1 root root       2584 Feb  3  2022 gai.conf

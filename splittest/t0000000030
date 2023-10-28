@@ -1,0 +1,3 @@
+-rw-r--r-- 1 root root        191 Mar 18  2022 libaudit.conf
+drwxr-xr-x 1 root root       4096 Jun  7 10:08 libblockdev/
+drwxr-xr-x 1 root root       4096 Jun  7 10:08 libnl-3/

@@ -1,0 +1,3 @@
+-rw-r--r-- 1 root root        887 Apr  2  2013 rpc
+-rw-r--r-- 1 root root       1382 Dec 24  2021 rsyslog.conf
+drwxr-xr-x 1 root root       4096 Oct  7 19:27 rsyslog.d/

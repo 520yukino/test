@@ -1,0 +1,3 @@
+-rw-r--r-- 1 root root       1136 Mar 23  2022 crontab
+drwxr-xr-x 1 root root       4096 Oct  7 19:27 cryptsetup-initramfs/
+-rw-r--r-- 1 root root         54 Jun  7 10:08 crypttab

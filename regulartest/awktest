@@ -1,0 +1,6 @@
+#awk实验
+echo 'Name 1st 2nd 3th
+User 1002 500 450
+yukino 780 900 6000
+xhy 10000 9999 40000' |
+awk 'NR==1 {printf "%10s %10s %10s %10s %10s\n", $1, $2, $3, $4, "Total"} NR>=2 {total=$2+$3+$4; printf "%10s %10s %10s %10s %10s\n", $1, $2, $3, $4, total}'

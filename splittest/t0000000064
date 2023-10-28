@@ -1,0 +1,3 @@
+drwxr-xr-x 1 root root       4096 Oct  7 19:27 update-motd.d/
+drwxr-xr-x 1 root root       4096 Mar 30  2022 update-notifier/
+-rw-r--r-- 1 root root        568 Feb 10  2022 updatedb.conf

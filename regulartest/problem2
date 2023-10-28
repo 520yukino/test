@@ -1,0 +1,4 @@
+#!/bin/bash
+#重点，alias在bash中属于需要交互模式，但shell脚本默认非交互模式，所以alias无法被执行，但可以使用source来执行
+alias myip="ipconfig.exe | grep IPv4 | sed 's/^.*: //g'"
+MYIP=$(myip)

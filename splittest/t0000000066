@@ -1,0 +1,3 @@
+drwxr-xr-x 1 root root       4096 Oct  7 19:26 vmware-tools/
+lrwxrwxrwx 1 root root         23 Jun  7 10:07 vtrgb -> /etc/alternatives/vtrgb
+drwxr-xr-x 1 root root       4096 Oct  7 19:40 vulkan/
