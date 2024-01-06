@@ -1,0 +1,190 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// 假设有以下AST节点类型
+typedef struct {
+    char* name;
+    char* type;
+} VarDeclarationNode;
+
+typedef struct {
+    char* variable;
+    char* expression;
+} AssignmentNode;
+
+typedef struct {
+    char* condition;
+    // 其他条件语句的信息...
+} IfStatementNode;
+
+// 符号表结构
+typedef struct {
+    char* name;
+    char* type;
+} SymbolTableEntry;
+
+typedef struct {
+    SymbolTableEntry* entries;
+    size_t size;
+    size_t capacity;
+} SymbolTable;
+
+// 占位符结构
+typedef struct {
+    char* placeholder;
+    void* node; // 指向AST节点
+} Placeholder;
+
+// 初始化符号表
+void init_symbol_table(SymbolTable* symbol_table, size_t initial_capacity) {
+    symbol_table->entries = (SymbolTableEntry*)malloc(initial_capacity * sizeof(SymbolTableEntry));
+    symbol_table->size = 0;
+    symbol_table->capacity = initial_capacity;
+}
+
+// 添加条目到符号表
+void add_entry(SymbolTable* symbol_table, const char* name, const char* type) {
+    // 确保符号表容量足够
+    if (symbol_table->size == symbol_table->capacity) {
+        symbol_table->capacity *= 2;
+        symbol_table->entries = (SymbolTableEntry*)realloc(symbol_table->entries, symbol_table->capacity * sizeof(SymbolTableEntry));
+    }
+
+    // 添加新条目
+    SymbolTableEntry* entry = &symbol_table->entries[symbol_table->size];
+    entry->name = strdup(name);
+    entry->type = strdup(type);
+
+    symbol_table->size++;
+}
+
+// 创建占位符
+Placeholder* create_placeholder(const char* placeholder, void* node) {
+    Placeholder* placeholder_entry = (Placeholder*)malloc(sizeof(Placeholder));
+    placeholder_entry->placeholder = strdup(placeholder);
+    placeholder_entry->node = node;
+    return placeholder_entry;
+}
+
+// 添加占位符到表
+void add_placeholder(Placeholder** placeholder_table, size_t* placeholder_count, Placeholder* placeholder_entry) {
+    // 假设placeholder_table是一个动态数组
+    (*placeholder_count)++;
+    *placeholder_table = (Placeholder*)realloc(*placeholder_table, (*placeholder_count) * sizeof(Placeholder));
+    (*placeholder_table)[*placeholder_count - 1] = *placeholder_entry;
+}
+
+// 在符号表中查找条目
+SymbolTableEntry* find_entry(SymbolTable* symbol_table, const char* name) {
+    for (size_t i = 0; i < symbol_table->size; ++i) {
+        if (strcmp(symbol_table->entries[i].name, name) == 0) {
+            return &symbol_table->entries[i];
+        }
+    }
+    return NULL; // 未找到
+}
+
+// 生成LLVM IR的函数
+void generate_llvm_ir(SymbolTable* symbol_table, Placeholder** placeholder_table, size_t* placeholder_count, void* node);
+
+// 递归处理AST节点
+void process_ast_node(SymbolTable* symbol_table, Placeholder** placeholder_table, size_t* placeholder_count, void* node) {
+    if (node == NULL) {
+        return;
+    }
+
+    if (/* node 是 VarDeclarationNode 类型 */) {
+        VarDeclarationNode* var_declaration = (VarDeclarationNode*)node;
+        add_entry(symbol_table, var_declaration->name, var_declaration->type);
+    } else if (/* node 是 AssignmentNode 类型 */) {
+        AssignmentNode* assignment = (AssignmentNode*)node;
+        SymbolTableEntry* variable_entry = find_entry(symbol_table, assignment->variable);
+        if (variable_entry != NULL) {
+            printf("store %s, %s* %s\n", assignment->expression, variable_entry->type, variable_entry->name);
+        } else {
+            // 如果变量条目未找到，创建一个占位符
+            Placeholder* placeholder_entry = create_placeholder("placeholder", node);
+            add_placeholder(placeholder_table, placeholder_count, placeholder_entry);
+        }
+    } else if (/* node 是 IfStatementNode 类型 */) {
+        IfStatementNode* if_statement = (IfStatementNode*)node;
+        // 处理条件语句，创建占位符
+        Placeholder* placeholder_entry = create_placeholder("placeholder", node);
+        add_placeholder(placeholder_table, placeholder_count, placeholder_entry);
+    }
+    // 其他类型的节点处理...
+
+    // 递归处理子节点
+    // process_ast_node(symbol_table, placeholder_table, placeholder_count, node->left);
+    // process_ast_node(symbol_table, placeholder_table, placeholder_count, node->right);
+}
+
+// 第二遍遍历，填充占位符
+void fill_placeholders(SymbolTable* symbol_table, Placeholder** placeholder_table, size_t placeholder_count) {
+    for (size_t i = 0; i < placeholder_count; ++i) {
+        Placeholder* placeholder_entry = &(*placeholder_table)[i];
+        generate_llvm_ir(symbol_table, placeholder_table, &placeholder_count, placeholder_entry->node);
+    }
+}
+
+// 生成LLVM IR的函数
+void generate_llvm_ir(SymbolTable* symbol_table, Placeholder** placeholder_table, size_t* placeholder_count, void* node) {
+    if (node == NULL) {
+        return;
+    }
+
+    // 处理可以直接生成的节点
+    process_ast_node(symbol_table, placeholder_table, placeholder_count, node);
+
+    // 递归处理子节点
+    // generate_llvm_ir(symbol_table, placeholder_table, placeholder_count, node->left);
+    // generate_llvm_ir(symbol_table, placeholder_table, placeholder_count, node->right);
+}
+
+// 清理符号表
+void cleanup_symbol_table(SymbolTable* symbol_table) {
+    for (size_t i = 0; i < symbol_table->size; ++i) {
+        free(symbol_table->entries[i].name);
+        free(symbol_table->entries[i].type);
+    }
+    free(symbol_table->entries);
+    symbol_table->size = 0;
+    symbol_table->capacity = 0;
+}
+
+// 清理占位符表
+void cleanup_placeholder_table(Placeholder* placeholder_table, size_t placeholder_count) {
+    for (size_t i = 0; i < placeholder_count; ++i) {
+        free(placeholder_table[i].placeholder);
+    }
+    free(placeholder_table);
+}
+
+int main() {
+    // 初始化符号表
+    SymbolTable symbol_table;
+    init_symbol_table(&symbol_table, 10);
+
+    // 初始化占位符表
+    Placeholder* placeholder_table = NULL;
+    size_t placeholder_count = 0;
+
+    // 假设有一个变量声明、赋值和条件语句的例子
+    VarDeclarationNode var_declaration = {"myVar", "i32"};
+    AssignmentNode assignment = {"myVar", "42"};
+    IfStatementNode if_statement = {"x > 0"};
+
+    // 从根节点开始生成LLVM IR
+    process_ast_node(&symbol_table, &placeholder_table, &placeholder_count, &var_declaration);
+    process_ast_node(&symbol_table, &placeholder_table, &placeholder_count, &assignment);
+    process_ast_node(&symbol_table, &placeholder_table, &placeholder_count, &if_statement);
+
+    // 第二遍遍历，填充占位符
+    fill_placeholders(&symbol_table, &placeholder_table, placeholder_count);
+
+    // 清理符号表和占位符表
+    cleanup_symbol_table(&symbol_table);
+    cleanup_placeholder_table(placeholder_table, placeholder_count);
+
+    return 0;
+}

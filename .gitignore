@@ -1,1 +1,5 @@
 bartest/**
+vimtest/**
+**.out
+.vscode/**
+yukino/**
